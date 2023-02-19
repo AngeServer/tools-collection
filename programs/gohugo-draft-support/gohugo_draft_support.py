@@ -23,11 +23,7 @@ import toml
 from ruamel.yaml.compat import StringIO
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
-from libs_python.terminal_utils import *
-
-yaml: ruamel.yaml.YAML = ruamel.yaml.YAML()
-yaml.allow_unicode = True
-yaml.default_flow_style = True
+from libs_python.terminal_utils import TerminalColor, TerminalUtil
 
 """
 Develop Operations
@@ -112,7 +108,7 @@ def _draft_edit(args) -> bool:
         front_matter["categories"] = list(map(lambda x: x, args.tags.split()))
     
     # イメージ生成前に一度書き込み
-    if write_front_matter(markdown_path=markdown, language="yaml", **markdown_data) == False:
+    if write_front_matter(markdown_path=markdown, language="yaml", print_detail=True, **markdown_data) == False:
         return print_error("フロントマターの更新に失敗しました。", exitcode=EXIT_ERR_DRAFT|FLAG_ERR_DRAFT_EDIT)
 
     # TCardgen Image
@@ -125,7 +121,7 @@ def _draft_edit(args) -> bool:
         if use_image_title:
             fm = read_front_matter(markdown_path=markdown, language="yaml")
             fm.get("result")["title"] = args.ititle
-            if write_front_matter(markdown_path=markdown, language="yaml", **fm) == False:
+            if write_front_matter(markdown_path=markdown, language="yaml", print_detail=False, **fm) == False:
                 return print_error("画像生成(title->ititleの設定)に失敗しました。", exitcode=EXIT_ERR_DRAFT|FLAG_ERR_DRAFT_EDIT)
             print_success(f"set title\t= {args.ititle}")
 
@@ -138,7 +134,7 @@ def _draft_edit(args) -> bool:
         if use_image_title:
             fm = read_front_matter(markdown_path=markdown, language="yaml")
             fm.get("result")["title"] = args.title
-            if write_front_matter(markdown_path=markdown, language="yaml", **fm) == False:
+            if write_front_matter(markdown_path=markdown, language="yaml", print_detail=False, **fm) == False:
                 return print_error("画像生成(ititle->titleの設定)に失敗しました。", exitcode=EXIT_ERR_DRAFT|FLAG_ERR_DRAFT_EDIT)
             print_success(f"set title\t= {args.title}")
     
@@ -227,12 +223,13 @@ def read_front_matter(markdown_path: pathlib.Path, language="yaml"):
     else:
         return print_error(f"language unknown [{language}]. support only toml,yaml or json.")
 
-def write_front_matter(markdown_path: pathlib.Path, start, end, before_text, after_text, result, language="yaml") -> bool:
+def write_front_matter(markdown_path: pathlib.Path, start, end, before_text, after_text, result, language="yaml", print_detail=True) -> bool:
     try:
         stream = StringIO()
         yaml.dump(data=result, stream=stream)
         fm = stream.getvalue()
-        print_success(f"\n===\n[REWRITE FRONT MATTER]\n===\n{fm}")
+        if print_detail:
+            print_success(f"\n===\n[REWRITE FRONT MATTER]\n===\n{fm}")
         out_buffer = before_text + fm + after_text
         markdown_path.write_text(data=out_buffer, encoding="utf-8")
     except Exception as e:
@@ -344,7 +341,13 @@ BRANCH_MAIN = None
 BRANCH_DEVELOP = None
 BRANCH_DRAFT = None
 BRANCH_HOTFIX = None
+
+yaml: ruamel.yaml.YAML = ruamel.yaml.YAML()
+yaml.allow_unicode = True
+yaml.default_flow_style = True
 load_config()
+TerminalUtil.set_ansimode_if_windows()
+TerminalUtil.set_text_io_wrapper()
 
 main_parser = argparse.ArgumentParser(prog="gohugo-tool", description="gohugo tools.")
 subparsers = main_parser.add_subparsers()
@@ -417,8 +420,6 @@ def main(args):
         print_error("引数エラー", exitcode=-1)
     pass
 
-TerminalUtil.set_ansimode_if_windows()
-TerminalUtil.set_text_io_wrapper()
 # argcomplete.autocomplete(main_parser)
 parse_args = main_parser.parse_args()
 if __name__ == '__main__':
