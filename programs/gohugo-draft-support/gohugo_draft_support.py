@@ -181,7 +181,7 @@ Common Functions: I/O
 #
 # 設定読み込み
 #
-def load_config():
+def load_config(config: pathlib.Path):
     global DEBUG
     global HUGO_PROJECT_ROOT
     global TCARDGEN_BIN
@@ -191,7 +191,7 @@ def load_config():
     global BRANCH_MAIN
     global BRANCH_DEVELOP
     global BRANCH_DRAFT
-    with open(f"{pathlib.Path(__file__).parent}/gohugo_draft_support-conf.yaml") as file:
+    with open(config) as file:
         y = yaml.load(file)
         settings = y["gohugo"]["settings"]
         HUGO_PROJECT_ROOT = settings["hugo_project_root"]
@@ -347,7 +347,9 @@ BRANCH_HOTFIX = None
 yaml: ruamel.yaml.YAML = ruamel.yaml.YAML()
 yaml.allow_unicode = True
 yaml.default_flow_style = True
-load_config()
+
+GOHUGO_DRAFT_SUPPORT_CONFIG = f"{pathlib.Path(__file__).parent}/gohugo_draft_support-conf.yaml"
+load_config(GOHUGO_DRAFT_SUPPORT_CONFIG)
 TerminalUtil.set_ansimode_if_windows()
 TerminalUtil.set_text_io_wrapper()
 
