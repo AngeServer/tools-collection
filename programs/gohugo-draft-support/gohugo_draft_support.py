@@ -108,7 +108,7 @@ def _draft_edit(args) -> bool:
         front_matter["categories"] = list(map(lambda x: x, args.tags.split()))
     
     # イメージ生成前に一度書き込み
-    if write_front_matter(markdown_path=markdown, language="yaml", print_detail=True, **markdown_data) == False:
+    if not write_front_matter(markdown_path=markdown, language="yaml", print_detail=True, **markdown_data):
         return print_error("フロントマターの更新に失敗しました。", exitcode=EXIT_ERR_DRAFT|FLAG_ERR_DRAFT_EDIT)
 
     # TCardgen Image
@@ -116,12 +116,14 @@ def _draft_edit(args) -> bool:
         out_image = markdown.parent.joinpath('index.png').absolute()
 
         use_image_title = arg_is_available(args, "ititle")
+        saved_title = None
         
         # 画像生成用にタイトルを一時設定
         if use_image_title:
             fm = read_front_matter(markdown_path=markdown, language="yaml")
+            saved_title = fm.get("result")["title"]
             fm.get("result")["title"] = args.ititle
-            if write_front_matter(markdown_path=markdown, language="yaml", print_detail=False, **fm) == False:
+            if not write_front_matter(markdown_path=markdown, language="yaml", print_detail=False, **fm):
                 return print_error("画像生成(title->ititleの設定)に失敗しました。", exitcode=EXIT_ERR_DRAFT|FLAG_ERR_DRAFT_EDIT)
             print_success(f"set title\t= {args.ititle}")
 
@@ -133,10 +135,10 @@ def _draft_edit(args) -> bool:
         # 画像生成用のタイトル一時設定を戻す
         if use_image_title:
             fm = read_front_matter(markdown_path=markdown, language="yaml")
-            fm.get("result")["title"] = args.title
-            if write_front_matter(markdown_path=markdown, language="yaml", print_detail=False, **fm) == False:
+            fm.get("result")["title"] = saved_title
+            if not write_front_matter(markdown_path=markdown, language="yaml", print_detail=False, **fm):
                 return print_error("画像生成(ititle->titleの設定)に失敗しました。", exitcode=EXIT_ERR_DRAFT|FLAG_ERR_DRAFT_EDIT)
-            print_success(f"set title\t= {args.title}")
+            print_success(f"set title\t= {saved_title}")
     
     return print_success()
 
@@ -274,21 +276,21 @@ def command(cmd, cwd=".") -> subprocess.CompletedProcess:
     if DEBUG: print(f"{cwd} # -> {cmd}")
     return subprocess.run(cmd, shell=True, encoding="utf-8", cwd=cwd)
 
-#
-# フロントマターの任意の値を直接書き換える
-#
-def command_sed_frontmatter(markdown_path: str, key: str, value: str, backup_suffix: str="") -> subprocess.CompletedProcess:
-    return command(cmd=f'sed -i{backup_suffix} -e \'0,/^{key}:/ s/^\({key}\):.*$/\\1: {value}/\' {markdown_path}', cwd=HUGO_PROJECT_ROOT)
+# #
+# # フロントマターの任意の値を直接書き換える
+# #
+# def command_sed_frontmatter(markdown_path: str, key: str, value: str, backup_suffix: str="") -> subprocess.CompletedProcess:
+#     return command(cmd=f'sed -i{backup_suffix} -e \'0,/^{key}:/ s/^\({key}\):.*$/\\1: {value}/\' {markdown_path}', cwd=HUGO_PROJECT_ROOT)
 
-#
-# フロントマター書き換え時にバックアップしたファイルを元に戻す時用の関数
-#
-def restore_markdown(markdown_path: str, backup_suffix: str) -> subprocess.CompletedProcess:
-    file_path = pathlib.Path(markdown_path)
-    orig_path = pathlib.Path(f'{markdown_path}{backup_suffix}')
-    if (file_path.exists() == False) or (orig_path.exists() == False):
-        return print_error("File Not Found")
-    return command(cmd=f'mv {markdown_path}{backup_suffix} {markdown_path}', cwd=HUGO_PROJECT_ROOT)
+# #
+# # フロントマター書き換え時にバックアップしたファイルを元に戻す時用の関数
+# #
+# def restore_markdown(markdown_path: str, backup_suffix: str) -> subprocess.CompletedProcess:
+#     file_path = pathlib.Path(markdown_path)
+#     orig_path = pathlib.Path(f'{markdown_path}{backup_suffix}')
+#     if (not file_path.exists()) or (not orig_path.exists()):
+#         return print_error("File Not Found")
+#     return command(cmd=f'mv {markdown_path}{backup_suffix} {markdown_path}', cwd=HUGO_PROJECT_ROOT)
 
 """
 Common Functions: Git
@@ -349,7 +351,7 @@ load_config()
 TerminalUtil.set_ansimode_if_windows()
 TerminalUtil.set_text_io_wrapper()
 
-main_parser = argparse.ArgumentParser(prog="gohugo-tool", description="gohugo tools.")
+main_parser = argparse.ArgumentParser(prog="gohugo-draft-support", description="Hugo Draft Edit Utility.")
 subparsers = main_parser.add_subparsers()
 
 # =========================================================
