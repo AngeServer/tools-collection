@@ -381,13 +381,14 @@ sp_draft_new.set_defaults(handler=do_draft_new)
 # ---------------------------------------------------------
 sp_draft_edit = draft_sp.add_parser("edit", help="stageされていない、任意のドラフト記事を編集します。", description="")
 sp_draft_edit.add_argument("--target", required=True, help="content/posts配下のセクション(URL部分)を指定します。（必須）")
-sp_draft_edit.add_argument("--images", action="store_true", required=False, help="デフォルトアイキャッチを上書き生成します。")
-sp_draft_edit.add_argument("--ititle", metavar="ITITLE", required=False, help="デフォルトアイキャッチに表示するタイトルテキストを指定します。")
 sp_draft_edit.add_argument("--title", required=False, help="記事タイトルを指定します。")
 sp_draft_edit.add_argument("--description", metavar="DESC", required=False, help="概要テキストを指定します。")
 sp_draft_edit.add_argument("--categories", metavar="CATGS", required=False, help="カテゴリを半角スペース区切りで指定します。")
 sp_draft_edit.add_argument("--tags", required=False, help="タグを半角スペース区切りで指定します。")
 sp_draft_edit.add_argument("--date", required=False, help="投稿日時を「YYYYmmddHHMMSS」形式指定します。")
+sp_draft_edit_tcg = sp_draft_edit.add_argument_group("Use TCardgen Option", description="これらのオプションを使うにはTCardgenがインストールされている必要があります。")
+sp_draft_edit_tcg.add_argument("--images", action="store_true", required=False, help="デフォルトアイキャッチを上書き生成します。")
+sp_draft_edit_tcg.add_argument("--ititle", metavar="ITITLE", required=False, help="デフォルトアイキャッチに表示するタイトルテキストを指定します。")
 sp_draft_edit.set_defaults(handler=do_draft_edit)
 
 # ---------------------------------------------------------
