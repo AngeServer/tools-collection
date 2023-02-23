@@ -6,14 +6,15 @@
     "words": [],
     "ignoreWords": [
         "Angolmois",
+        "CATGS",
         "TCARDGEN",
         "ansimode",
         "argcomplete",
         "argparse",
         "gohugo",
-        "unstage",
         "ititle",
-        "ruamel"
+        "ruamel",
+        "unstage"
     ],
     "import": []
 }

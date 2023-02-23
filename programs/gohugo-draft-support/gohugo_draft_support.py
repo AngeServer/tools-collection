@@ -105,7 +105,7 @@ def _draft_edit(args) -> bool:
     
     # カテゴリ
     if arg_is_available(args, "categories"):
-        front_matter["categories"] = list(map(lambda x: x, args.tags.split()))
+        front_matter["categories"] = list(map(lambda x: x, args.categories.split()))
     
     # イメージ生成前に一度書き込み
     if not write_front_matter(markdown_path=markdown, language="yaml", print_detail=True, **markdown_data):
