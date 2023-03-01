@@ -1,0 +1,20 @@
+{
+    "version": "0.2",
+    "ignorePaths": [],
+    "dictionaryDefinitions": [],
+    "dictionaries": [],
+    "words": [],
+    "ignoreWords": [
+        "Angolmois",
+        "CATGS",
+        "TCARDGEN",
+        "ansimode",
+        "argcomplete",
+        "argparse",
+        "gohugo",
+        "ititle",
+        "ruamel",
+        "unstage"
+    ],
+    "import": []
+}
