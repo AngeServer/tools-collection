@@ -128,7 +128,7 @@ def _draft_edit(args) -> bool:
             print_success(f"set title\t= {args.ititle}")
 
         # 画像生成
-        process = command(f"{TCARDGEN_BIN} -f {TCARDGEN_FONT_DIR} -c {TCARDGEN_CONF} -o {out_image} {markdown} >/dev/null", cwd=HUGO_PROJECT_ROOT)
+        process = command(f"{TCARDGEN_BIN} -f {TCARDGEN_FONT_DIR} -c {TCARDGEN_CONF} -o {out_image} {markdown}", cwd=HUGO_PROJECT_ROOT)
         if process.returncode != 0: return print_error(process.stderr, exitcode=EXIT_ERR_DRAFT|FLAG_ERR_DRAFT_NEW)
         print_success(f"generate img\t= {out_image}")
 
