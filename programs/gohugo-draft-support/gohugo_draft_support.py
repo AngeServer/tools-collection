@@ -213,8 +213,8 @@ def read_front_matter(markdown_path: pathlib.Path, language="yaml"):
     # TODO ISSUE follow json, toml
 
     if language == "yaml":
-        pattern_fm_toml = re.compile(r"\n?\-\-\-\n(.|\s)*?\-\-\-\n")
-        m = pattern_fm_toml.search(text)
+        pattern_fm_yaml = re.compile(r"\n?\-\-\-\n(.|\s)*?\-\-\-\n")
+        m = pattern_fm_yaml.search(text)
         fm_start = m.start() + 4
         fm_end = m.end() - 5
         before_text = text[0:fm_start]
